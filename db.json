@@ -1,0 +1,57 @@
+{
+  "register": [
+    {
+      "email": "johan@gmail.com",
+      "fullName": "johan singh",
+      "password": "Admin@123456",
+      "confirmPassword": "Admin@123456",
+      "phone": "123456789",
+      "id": 2
+    },
+    {
+      "fullName": "aneet kaur",
+      "email": "aneetkaur1611@gmail.com",
+      "phone": "7837286561",
+      "password": "Admin@123456",
+      "confirmPassword": "Admin@123456",
+      "id": 3
+    },
+    {
+      "email": "aneet.kaur@netsolutions.com",
+      "fullName": "dddd",
+      "password": "Admin@123",
+      "confirmPassword": "Admin@123",
+      "phone": "",
+      "id": 4
+    }
+  ],
+  "signin": [
+    {
+      "id": 1,
+      "email": "aneetkaur1611@gmail.com",
+      "password": "Admin@123456"
+    }
+  ],
+  "students": [
+    {
+      "studentName": "Johan",
+      "email": "johan@gmail.com",
+      "id": 11
+    },
+    {
+      "studentName": "Bruce",
+      "email": "bruce@gmail.com",
+      "id": 12
+    },
+    {
+      "studentName": "test",
+      "email": "test@gmail.com",
+      "id": 13
+    },
+    {
+      "studentName": "test",
+      "email": "test@gmail.com",
+      "id": 14
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+.button-box{
+    span{
+        padding: 0 5px;
+        margin-left: 5px;
+        cursor: pointer;
+        &.font-default{
+            @include fontsize(14)
+        }
+        &.font-large{
+            @include fontsize(16)
+        }
+        &.font-extra-large{
+            @include fontsize(18)
+        }
+    }
+}
+.navbar-brand{
+    @include fontsize(16)
+}

@@ -1,0 +1,12 @@
+@mixin fontsize($property) {
+    font-size: $property+px;
+
+    .large & {
+        font-size: $property+2+px;
+    }
+
+    .extra-large & {
+        font-size: $property+4+px;
+    }
+
+}

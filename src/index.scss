@@ -1,0 +1,165 @@
+@import "./assets/scss/style.scss";
+
+html {
+  font-size: 10px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @include fontsize(16);
+
+  &.large {
+    @include fontsize(18);
+  }
+
+  &.extra-large {
+    @include fontsize(20);
+  }
+}
+
+h1 {
+  @include fontsize(30);
+}
+
+h2 {
+  @include fontsize(28);
+}
+
+h3 {
+  @include fontsize(24);
+}
+
+h4 {
+  @include fontsize(22);
+}
+
+h5 {
+  @include fontsize(20);
+}
+
+h5 {
+  @include fontsize(18);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+
+  &:hover,
+  &:focus {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+p {
+  margin-bottom: 2rem;
+}
+
+.btn {
+  min-height: 50px;
+  text-transform: uppercase;
+  @include fontsize(16);
+  padding: 1rem 2rem;
+
+  &.btn-sm {
+    @include fontsize(14);
+    padding: 0.6rem 2rem;
+    min-height: auto;
+  }
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.nav-link {
+  cursor: pointer;
+}
+
+.page-height {
+  height: calc(100vh - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.modal-header {
+  border: 0;
+  padding: 1.5rem 3rem;
+  .close {
+    padding: 1rem 1rem;
+    margin: -1rem -1rem -1rem auto;
+    font-size: 1.6rem;
+    text-shadow: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 3rem;
+    height: 3rem;
+    background: red;
+    opacity: 1;
+    color: #fff;
+    line-height: 2.6rem;
+    padding: 0;
+    text-align: center;
+    border: 0;
+    cursor: pointer;
+    border-radius: 100%;
+    z-index: 3;
+    display: block;
+    &:hover,&:focus{
+      opacity: 1 !important;
+    }
+  }
+}
+.modal-body{
+  padding: 1.5rem 3rem;
+}
+.switch{
+  &.btn{
+     @include fontsize(14);
+     min-height: auto;
+     padding: .375rem .75rem;
+    .btn{
+      @include fontsize(14);
+      font-weight: 700;
+      text-transform: none;
+      min-height: auto;
+      padding: .375rem .75rem;
+      &.switch-handle{
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+      &.switch-on{
+        padding-right: 3rem;
+      }
+      &.switch-off{
+        padding-left: 3rem;
+      }
+    }
+  }
+}
+.form-control{
+  height: 50px;
+  border-radius: 4px;
+  outline: 0;
+  background-color: transparent;
+  padding: 5px 15px;
+  @include fontsize(16);
+  outline: 0;
+  &:focus{
+    border-color: black;
+      box-shadow: none;
+  }
+}
+.input-group{
+  .input-group-text{
+    @include fontsize(16);
+  }
+}
