@@ -1,5 +1,5 @@
 import BootstrapSwitchButton from "bootstrap-switch-button-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Button,
@@ -16,8 +16,16 @@ import {
 import InputField from "../../../components/InputField/InputField";
 import EmployeeDataService from "../../../services/EmployeeService";
 import { decimalCond } from "../../../utils/validation";
+import moment from "moment";
 
-const EmployeeModal = ({ showEmployeeModal, closeEmployeeModal, updateListData }) => {
+const EmployeeModal = ({
+  modalTitle,
+  showEmployeeModal,
+  closeEmployeeModal,
+  refreshListData,
+  editEmpId,
+  setEditEmpId,
+}) => {
   const [employeeData, setEmployeeData] = useState({
     empName: "",
     email: "",
@@ -28,14 +36,15 @@ const EmployeeModal = ({ showEmployeeModal, closeEmployeeModal, updateListData }
 
   const [message, setMessage] = useState({ error: false, msg: "" });
   const [salaryError, setSalaryError] = useState("");
+  const [emailError ,setEmailError] = useState("");
+
   const handleChange = (e) => {
     const nameInput = e.target.name;
     const valueInput = e.target.value;
     setEmployeeData({ ...employeeData, [nameInput]: valueInput });
     // Decimal validation
-   // const salary = employeeData.salary;
     if (nameInput == "salary") {
-      console.log("valueInput", valueInput)
+      //console.log("valueInput", valueInput)
       if (!decimalCond.test(valueInput)) {
         setSalaryError("Enter decimal value");
       } else {
@@ -54,16 +63,16 @@ const EmployeeModal = ({ showEmployeeModal, closeEmployeeModal, updateListData }
     }
   };
 
+  ////Add Employee
   const handleEmployeeSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
-
     const isValid = checkSalaryValidation();
     if (
       !employeeData.empName ||
       !employeeData.email ||
       !employeeData.dob ||
-      !employeeData.salary && !isValid
+      (!employeeData.salary && !isValid)
     ) {
       setMessage({ error: true, msg: "All fields are mandatory!" });
       return;
@@ -78,13 +87,18 @@ const EmployeeModal = ({ showEmployeeModal, closeEmployeeModal, updateListData }
     };
 
     try {
-      await EmployeeDataService.addEmployees(newEmployee);
-      setMessage({ error: false, msg: "New Employee added successfully!" });
+      if (editEmpId !== undefined && editEmpId !== "") {
+        await EmployeeDataService.updateEmployee(editEmpId, newEmployee);
+        setEditEmpId("");
 
+        setMessage({ error: false, msg: "Updated successfully!" });
+      } else {
+        await EmployeeDataService.addEmployees(newEmployee);
+        setMessage({ error: false, msg: "New Employee added successfully!" });
+      }
     } catch (err) {
       setMessage({ error: true, msg: err.message });
     }
-
     setEmployeeData({
       empName: "",
       email: "",
@@ -92,11 +106,35 @@ const EmployeeModal = ({ showEmployeeModal, closeEmployeeModal, updateListData }
       salary: "",
       workStatus: false,
     });
-    
+
     closeEmployeeModal();
-    updateListData();
-    
+    refreshListData();
   };
+
+  //// Edit Emp
+  const editHandler = async (e) => {
+    setMessage("");
+    try {
+      const empEdit = await EmployeeDataService.getEmployee(editEmpId);
+    //  console.log("the record is :", empEdit.data());
+    setEmployeeData({
+      empName: empEdit.data().empName,
+      email: empEdit.data().email,
+      dob: empEdit.data().dob,
+      salary: empEdit.data().salary,
+      workStatus: empEdit.data().workStatus,
+    });
+      
+    } catch (err) {
+      setMessage({ error: true, msg: err.message });
+    }
+  };
+  useEffect(() => {
+    if (editEmpId !== undefined && editEmpId !== "") {
+      editHandler();
+    }
+  }, [editEmpId]);
+
   return (
     <Modal
       show={showEmployeeModal}
@@ -105,7 +143,7 @@ const EmployeeModal = ({ showEmployeeModal, closeEmployeeModal, updateListData }
       onHide={closeEmployeeModal}
     >
       <ModalHeader className="bg-primary">
-        <h3 className="text-white">Add Employee</h3>
+        <h3 className="text-white">{modalTitle}</h3>
         <span className="close" onClick={closeEmployeeModal}>
           &times;
         </span>
@@ -128,12 +166,14 @@ const EmployeeModal = ({ showEmployeeModal, closeEmployeeModal, updateListData }
             onChange={handleChange}
             value={employeeData.empName ?? ""}
           />
+       
           <InputField
             label="Email Address"
             type="email"
             name="email"
             onChange={handleChange}
             value={employeeData.email ?? ""}
+            disabled={modalTitle === "Edit Employee" ? true : false}
           />
           <InputField
             label="Date of Birth"
@@ -141,7 +181,9 @@ const EmployeeModal = ({ showEmployeeModal, closeEmployeeModal, updateListData }
             name="dob"
             onChange={handleChange}
             value={employeeData.dob ?? ""}
+            max={moment(new Date()).format("YYYY-MM-DD")}
           />
+         
           <FormGroup className="mb-4 pb-2">
             <FormLabel className="font-bold mr-4 ">Salary</FormLabel>
             <InputGroup>
@@ -174,8 +216,8 @@ const EmployeeModal = ({ showEmployeeModal, closeEmployeeModal, updateListData }
               }}
             />
           </FormGroup>
-          <Button type="submit" className="w-100 mb-3" >
-            Add Employee
+          <Button type="submit" className="w-100 mb-3">
+            {modalTitle == "Edit Employee" ? "Update" : "Submit"}
           </Button>
         </Form>
       </ModalBody>

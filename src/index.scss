@@ -92,6 +92,7 @@ p {
 .modal-header {
   border: 0;
   padding: 1.5rem 3rem;
+
   .close {
     padding: 1rem 1rem;
     margin: -1rem -1rem -1rem auto;
@@ -113,39 +114,48 @@ p {
     border-radius: 100%;
     z-index: 3;
     display: block;
-    &:hover,&:focus{
+
+    &:hover,
+    &:focus {
       opacity: 1 !important;
     }
   }
 }
-.modal-body{
+
+.modal-body {
   padding: 1.5rem 3rem;
 }
-.switch{
-  &.btn{
-     @include fontsize(14);
-     min-height: auto;
-     padding: .375rem .75rem;
-    .btn{
+
+.switch {
+  &.btn {
+    @include fontsize(14);
+    min-height: auto;
+    padding: .375rem .75rem;
+
+    .btn {
       @include fontsize(14);
       font-weight: 700;
       text-transform: none;
       min-height: auto;
       padding: .375rem .75rem;
-      &.switch-handle{
+
+      &.switch-handle {
         padding-left: 2rem;
         padding-right: 2rem;
       }
-      &.switch-on{
+
+      &.switch-on {
         padding-right: 3rem;
       }
-      &.switch-off{
+
+      &.switch-off {
         padding-left: 3rem;
       }
     }
   }
 }
-.form-control{
+
+.form-control {
   height: 50px;
   border-radius: 4px;
   outline: 0;
@@ -153,13 +163,83 @@ p {
   padding: 5px 15px;
   @include fontsize(16);
   outline: 0;
-  &:focus{
+
+  &:focus {
     border-color: black;
-      box-shadow: none;
+    box-shadow: none;
   }
 }
-.input-group{
-  .input-group-text{
+
+.input-group {
+  .input-group-text {
     @include fontsize(16);
   }
+}
+
+.react-bootstrap-table-pagination {
+  margin-top: 3rem;
+
+  .react-bootstrap-table-pagination-total {
+    font-weight: 700;
+  }
+
+  .pagination {
+    justify-content: flex-end;
+
+    .page-link {
+      width: 40px;
+      height: 4rem;
+      text-align: center;
+      line-height: 38px;
+      padding: 0;
+    }
+  }
+}
+
+.search-label {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.react-bootstrap-table {
+  th {
+    > .react-bootstrap-table-sort-order > .caret {
+      margin: 10px 6.5px;
+    }
+    .order {
+      >.dropdown {
+        >.caret {
+          margin: 10px 0 10px 5px;
+          color: #000;
+        }
+      }
+
+      >.dropup {
+        .caret {
+          margin: 10px 0;
+          color: #000;
+        }
+      }
+    }
+  }
+}
+.caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-top: 4px dashed;
+  border-top: 4px solid\9;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+.dropup .caret {
+  content: "";
+  border-top: 0;
+  border-bottom: 4px dashed;
+  border-bottom: 4px solid\9;
+}
+.react-bootstrap-table-pagination-list-hidden{
+  display: none;
 }

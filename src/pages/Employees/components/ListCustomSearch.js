@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { ButtonGroup, Button, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { ButtonGroup, Button, Alert, FormControl, Form } from "react-bootstrap";
 import EmployeeDataService from "../../../services/EmployeeService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
@@ -8,17 +7,20 @@ import { faEdit, faEye } from "@fortawesome/free-regular-svg-icons";
 import {
   faChevronLeft,
   faChevronRight,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import DeleteEmployeeModal from "./DeleteEmployeeModal";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import EmployeeModal from "./EmployeeModal";
 import ViewEmployeeModal from "./ViewEmployeeModal";
-import ToolkitProvider, {
-  Search,
-} from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit";
+import InputGroup from "react-bootstrap/InputGroup";
 
-const List = ({ refreshUserList, addEmpSuccessMsg, deleteAddSuccessMsg }) => {
+const ListCustomSearch = ({
+  refreshUserList,
+  addEmpSuccessMsg,
+  deleteAddSuccessMsg,
+}) => {
   const [employeesList, setEmployeesList] = useState([]);
   const [employeeModalShow, setEmployeeModalShow] = useState(false);
   const [empDeleteModalShow, setEmpDeleteeModalShow] = useState(false);
@@ -26,15 +28,20 @@ const List = ({ refreshUserList, addEmpSuccessMsg, deleteAddSuccessMsg }) => {
   const [deleteSuccessMsg, setDeleteSuccessMsg] = useState(false);
   const [editEmpSuccessMsg, setEditEmpSuccessMsg] = useState(false);
   const [empId, setEmpId] = useState("");
+  const [customSearch, setCustomSearch] = useState("");
+  const [searchResult, setSearchResult] = useState([]);
 
   ///Show Table Data
   const getEemployeesList = async () => {
     try {
       const employesstData = await EmployeeDataService.getAllEmployees();
       // console.log("List", employesstData);
-      setEmployeesList(
-        employesstData.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-      );
+      let empDataList = employesstData.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+      }));
+      setEmployeesList(empDataList);
+      setSearchResult(empDataList);
     } catch (error) {
       console.log("Error Message", error);
     }
@@ -46,31 +53,27 @@ const List = ({ refreshUserList, addEmpSuccessMsg, deleteAddSuccessMsg }) => {
   const refreshEditList = () => {
     getEemployeesList();
     setEditEmpSuccessMsg(true);
-    setTimeout(() => {
-      // After 7 seconds set the show value to false
-      setEditEmpSuccessMsg(false);
-    }, 7000);
   };
 
-  
-
+  setTimeout(() => {
+    // After 7 seconds set the show value to false
+    setEditEmpSuccessMsg(false);
+    setDeleteSuccessMsg(false);
+  }, 7000);
+  //console.log(editEmpSuccessMsg);
 
   ////Delete Employee
   const deleteHandler = async () => {
     await EmployeeDataService.deleteEmployee(empId);
     getEemployeesList();
     setEmpDeleteeModalShow(false);
-
     setDeleteSuccessMsg(true);
   };
-  const { SearchBar } = Search;
+
   /////Action Button
   const actionFormatter = (employeesList, row) => {
     return (
       <ButtonGroup className="mb-2">
-        {/* <Link to={`/employeedetail/${row.id}`} className="btn btn-success">
-          <FontAwesomeIcon icon={faEye} />
-        </Link> */}
         <Button
           variant="success"
           onClick={() => {
@@ -148,11 +151,24 @@ const List = ({ refreshUserList, addEmpSuccessMsg, deleteAddSuccessMsg }) => {
   );
   const paginationOptions = {
     showTotal: true,
-    paginationTotalRenderer: customTotal,
     hidePageListOnlyOnePage: true,
+    paginationTotalRenderer: customTotal,
     prePageText: <FontAwesomeIcon icon={faChevronLeft} />,
     nextPageText: <FontAwesomeIcon icon={faChevronRight} />,
     sizePerPageList: [4], // A numeric array is also available. the purpose of above example is custom the text
+  };
+
+  const handleSearchChange = (event) => {
+    let valueInput = event.target.value;
+    setCustomSearch(valueInput);
+    if (valueInput !== "") {
+      let newEmpList = searchResult.filter((item) =>
+        item.empName.toLowerCase().includes(valueInput.toLowerCase())
+      );
+      setEmployeesList(newEmpList); // 5
+    } else {
+      setEmployeesList([...searchResult]);
+    }
   };
 
   return (
@@ -181,32 +197,40 @@ const List = ({ refreshUserList, addEmpSuccessMsg, deleteAddSuccessMsg }) => {
           Employee Updated Successfully
         </Alert>
       )}
-      <ToolkitProvider
-        keyField="id"
-        data={employeesList}
-        columns={columns}
-        search
-      >
-        {(props) => (
-          <>
-            <SearchBar {...props.searchProps} />
-            {employeesList?.length > 0 ? (
-              <BootstrapTable
-                hover
-                bordered
-                responsive
-                keyField="id"
-                data={employeesList}
-                columns={columns}
-                pagination={paginationFactory(paginationOptions)}
-                {...props.baseProps}
+
+      <>
+        <div className="search-box my-5 ">
+          <Form>
+            <InputGroup className="mb-3">
+              <InputGroup.Text>
+                <FontAwesomeIcon icon={faSearch} />
+              </InputGroup.Text>
+              <FormControl
+                type="text"
+                placeholder="Search"
+                onChange={handleSearchChange}
+                value={customSearch}
               />
-            ) : (
-              <h1 className="text-center mt-5">No Employee Found</h1>
-            )}
+            </InputGroup>
+          </Form>
+        </div>
+        {employeesList?.length > 0 ? (
+          <>
+            <BootstrapTable
+              hover
+              bordered
+              responsive
+              keyField="id"
+              data={employeesList}
+              columns={columns}
+              pagination={paginationFactory(paginationOptions)}
+            />
           </>
+        ) : (
+          <h1 className="text-center mt-5">No Employee Found</h1>
         )}
-      </ToolkitProvider>
+      </>
+
       {empDeleteModalShow && (
         <DeleteEmployeeModal
           showDeleteEmployeeModal={() => {
@@ -247,4 +271,4 @@ const List = ({ refreshUserList, addEmpSuccessMsg, deleteAddSuccessMsg }) => {
   );
 };
 
-export default List;
+export default ListCustomSearch;

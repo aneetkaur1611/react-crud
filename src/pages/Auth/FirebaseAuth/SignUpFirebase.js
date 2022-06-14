@@ -1,19 +1,19 @@
 import axios from "axios";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { Alert, Button, Card, Container, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../../components/InputField/InputField";
-import { auth } from "../../../firebase";
+
 import {
   passwordCond1,
   passwordCond2,
   passwordCond3,
   emailCond,
 } from "../../../utils/validation";
+import { useUserAuth } from "../../../utils/context/UserAuthContext";
 
 const SignUpFirebase = () => {
-
   const [inputValue, setInputValue] = useState({
     email: "",
     fullName: "",
@@ -21,15 +21,16 @@ const SignUpFirebase = () => {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState({});
-  // const [errorMsg, setErrorMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [success, setSuccess] = useState(false);
   const [submitButtonDisabled, setSubmitButtonDisabled] = useState(false);
-
+  const { signUp } = useUserAuth();
+const navigate = useNavigate();
   const handleInputChange = (event) => {
     const nameInput = event.target.name;
     const valueInput = event.target.value;
     setInputValue({ ...inputValue, [nameInput]: valueInput });
-   // console.log("change", inputValue.fullName);
+    // console.log("change", inputValue.fullName);
     // Name validation
     if (nameInput == "fullName") {
       if (!inputValue.fullName) {
@@ -73,24 +74,18 @@ const SignUpFirebase = () => {
       }
     }
     //matchPassword validation
-    console.log(valueInput, password);
+    //console.log(valueInput, password);
     if (nameInput == "confirmPassword") {
-     
       if (!inputValue.confirmPassword) {
         errors.confirmPassword = "Password confirmation is required";
-        
-      } else if (password !== valueInput ) {
-       
-        errors.confirmPassword =
-          "Password does not match";
-       
+      } else if (password !== valueInput) {
+        errors.confirmPassword = "Password does not match";
       } else {
         delete errors.confirmPassword;
         setSubmitButtonDisabled(false);
       }
     }
     setErrors(errors);
-    
   };
 
   const checkValidation = () => {
@@ -103,9 +98,8 @@ const SignUpFirebase = () => {
     } else if (inputValue.fullName.length < 3) {
       errors.fullName = "Name required atleast 3 characters ";
       isValid = false;
-    }
-    else{
-      errors.fullName="";
+    } else {
+      errors.fullName = "";
     }
 
     // Email validation
@@ -151,45 +145,61 @@ const SignUpFirebase = () => {
 
     setErrors(errors);
     return isValid;
-  
   };
 
-  function handleSignUp(e) {
+  const handleSignUp = async (e) => {
     e.preventDefault();
-    // if(!inputValue.fullName || !inputValue.email || !inputValue.password || !inputValue.confirmPassword){
-    //   setErrorMsg("Fill all fields");
-    //   return;
-    // }
-    // setErrorMsg(" ");
-
     const isValid = checkValidation();
     setSubmitButtonDisabled(true);
-
     if (isValid) {
-      setInputValue("");
-      setSuccess(true);
-     
-      createUserWithEmailAndPassword(
-        auth,
-        inputValue.email,
-        inputValue.password
-      )
-        .then(async (res) => {
-          setSubmitButtonDisabled(false);
-          const user = res.user;
-          await updateProfile(user, {
-            displayName: inputValue.fullName,
-          });
-       
-        })
-        .catch((err) => {
-          setSubmitButtonDisabled(false);
-          setErrors(err.message);
-        });
+      try {
+        setSubmitButtonDisabled(false);
+        await signUp(inputValue.email, inputValue.password);  
+        setInputValue("");
+        setSuccess(true);
+        navigate("/")
+      } catch (err) {
+        if (err.code == "auth/email-already-in-use") {
+          setErrorMsg("Email already in use");
+          setSuccess(false);
+        }
+        setSubmitButtonDisabled(false);
+        setErrors(err.message);
+        console.log(err);
+      }
     } else {
       setSuccess(false);
     }
-  }
+    // if (isValid) {
+    //   createUserWithEmailAndPassword(
+    //     auth,
+    //     inputValue.email,
+    //     inputValue.password
+    //   )
+    //     .then(async (res) => {
+
+    //       setSubmitButtonDisabled(false);
+    //       const user = res.user;
+    //       await updateProfile(user, {
+    //         displayName: inputValue.fullName,
+    //       });
+    //       setInputValue("");
+    //       setSuccess(true);
+    //     })
+    //     .catch((err) => {
+    //       if(err.code == "auth/email-already-in-use"){
+    //         setErrorMsg("Email already in use");
+    //         setSuccess(false)
+    //       }
+    //       setSubmitButtonDisabled(false);
+    //       setErrors(err.message);
+    //       console.log(err);
+    //     });
+
+    // } else {
+    //   setSuccess(false);
+    // }
+  };
   return (
     <Container>
       {success ? (
@@ -198,11 +208,11 @@ const SignUpFirebase = () => {
             <Alert.Heading>
               You have successfuly submited your form.
             </Alert.Heading>
-            <div>Please click on login button to continue</div>
+            <div>Please click on employee button to continue</div>
           </Alert>
 
-          <Link to="/login" className="btn btn-primary">
-            Login
+          <Link to="/employees" className="btn btn-primary">
+            Employees
           </Link>
         </div>
       ) : (
@@ -210,11 +220,7 @@ const SignUpFirebase = () => {
           <Card className="mx-auto mt-5" style={{ width: "50rem" }}>
             <Card.Header>
               <h3>Register</h3>
-              {/* {errorMsg && (
-                  <small className="text-danger">
-                    {errorMsg}
-                  </small>
-                )} */}
+              {errorMsg && <small className="text-danger">{errorMsg}</small>}
             </Card.Header>
             <Card.Body>
               <form onSubmit={handleSignUp}>

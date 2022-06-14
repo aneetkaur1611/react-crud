@@ -3,31 +3,48 @@ import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import { getAuth, signOut } from "firebase/auth";
+import { useUserAuth } from "../utils/context/UserAuthContext";
 
 const Header = () => {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState("");
-  useEffect(() => {
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-      //  console.log(user);
-        setIsLoggedIn(user.email);
-      } else {
-        setIsLoggedIn("");
-      }
-    });
-  }, []);
-  const handleSignout = () => {
-    const auth = getAuth();
-    signOut(auth)
-      .then(() => {
-        // Sign-out successful.
-        navigate("/");
-      })
-      .catch((error) => {
-        // An error happened.
-      });
+  // const [isLoggedIn, setIsLoggedIn] = useState("");
+  const { user, logOut } = useUserAuth();
+  // useEffect(() => {
+  //   auth.onAuthStateChanged((user) => {
+  //     if (user) {
+  //       //  console.log(user);
+  //       setIsLoggedIn(user.email);
+  //     } else {
+  //       setIsLoggedIn("");
+  //     }
+  //   });
+  // }, []);
+  const handleSignout = async () => {
+    try {
+      await logOut();
+      navigate("/");
+    } catch (error) {
+      console.log(error.message);
+    }
   };
+  // const handleSignout = async () => {
+  //   try {
+  //     await logOut()
+  //   }
+  //   catch (err){
+  //     console.log(err.message);
+  //   }
+  //   // const auth = getAuth();
+  //   // signOut(auth)
+  //   //   .then(() => {
+  //   //     // Sign-out successful.
+  //   //     navigate("/");
+  //   //   })
+  //   //   .catch((error) => {
+  //   //     // An error happened.
+  //   //     console.log(error);
+  //   //   });
+  // };
   const handleBtnDefault = () => {
     document.body.classList.remove("large");
     document.body.classList.remove("extra-large");
@@ -48,7 +65,7 @@ const Header = () => {
             React API
           </Link>
           <Nav>
-            {!isLoggedIn ? (
+            {!user ? (
               <>
                 <Link to="/login" className="nav-link">
                   Login
@@ -68,18 +85,11 @@ const Header = () => {
                 <span onClick={handleSignout} className="nav-link">
                   Signout
                 </span>
-                {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-             <Link to="/login" className="dropdown-item">
-                Profile
-              </Link>
-              <span onClick={handleSignout} className="dropdown-item">
-                Signout
-              </span>
-        </NavDropdown> */}
+                
               </>
             )}
           </Nav>
-          <div className="button-box">
+          <div className="button-box d-none">
             <span className="font-default" onClick={handleBtnDefault}>
               A
             </span>

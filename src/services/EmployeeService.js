@@ -25,7 +25,7 @@ class EmployeeDataService {
     return deleteDoc(employeeDoc);
   };
 
-  getAllEmployess = () => {
+  getAllEmployees = () => {
     return getDocs(employeeCollectionRef);
   };
 

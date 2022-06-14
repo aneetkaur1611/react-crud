@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import { Outlet } from 'react-router-dom';
 import Header from './Header';
 
 const TheLayout = (props) => {
@@ -6,6 +7,7 @@ const TheLayout = (props) => {
         <Fragment>
             <Header />
              {props.children }
+             {/* <Outlet /> */}
         </Fragment>
     );
 };

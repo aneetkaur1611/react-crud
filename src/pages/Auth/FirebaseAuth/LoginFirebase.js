@@ -10,6 +10,7 @@ import {
   passwordCond3,
   emailCond,
 } from "../../../utils/validation";
+import { useUserAuth } from "../../../utils/context/UserAuthContext";
 
 const LoginFirebase = () => {
   const navigate = useNavigate();
@@ -19,7 +20,8 @@ const LoginFirebase = () => {
   });
   const [errorMsg, setErrorMsg] = useState({});
   const [submitButtonDisabled, setSubmitButtonDisabled] = useState(false);
-  
+  const { logIn } = useUserAuth();
+
   const onChangeHandler = (e) => {
     const itemValue = e.target.value;
     const nameInput = e.target.name;
@@ -65,7 +67,7 @@ const LoginFirebase = () => {
       errorMsg.email = "Email required";
       isValid = false;
     } else if (!emailCond.test(values.email)) {
-      errorMsg.email = "Email not valod";
+      errorMsg.email = "Email not valid";
       isValid = false;
     }
 
@@ -94,27 +96,24 @@ const LoginFirebase = () => {
     setErrorMsg(errorMsg);
     return isValid;
   };
-  const handleLoginForm = (e) => {
+ 
+  const handleLoginForm = async (e) => {
     e.preventDefault();
     setSubmitButtonDisabled(true);
     const isValid = checkValidation();
 
     if (isValid) {
       setValues("");
-      signInWithEmailAndPassword(auth, values.email, values.password)
-      .then(async (res) => {
-        console.log(res);
+      try {
+        await logIn(values.email, values.password);
         setSubmitButtonDisabled(false);
-        const user = res.user;
-        await updateProfile(user, {
-          //   displayName: inputValue.fullName,
-        });
-       navigate("/");
-      })
-      .catch((err) => {
+        navigate("/");
+      }
+      
+      catch (err) {
         setSubmitButtonDisabled(false);
         setErrorMsg(err.message);
-      });
+      };
     } 
   
   };
